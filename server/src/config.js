@@ -7,14 +7,24 @@ const config = {
   jwtSecret: process.env.JWT_SECRET,
   knex: knexConfig,
   mail: {
+    // Gmail SMTP (local dev). Hosts that block SMTP (e.g. Render free) use Brevo's HTTPS API instead.
     user: process.env.EMAIL_USER,
     appPassword: process.env.EMAIL_APP_PASSWORD,
+    brevoApiKey: process.env.BREVO_API_KEY,
+    // The sender address: must be a verified sender in Brevo. Defaults to EMAIL_USER.
+    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
   },
   // Links and contact details used inside emails.
   email: {
     siteUrl: (process.env.SITE_URL || 'http://localhost:3000').replace(/\/$/, ''),
     adminUrl: (process.env.ADMIN_URL || 'http://localhost:4200').replace(/\/$/, ''),
     supportEmail: process.env.SUPPORT_EMAIL || 'support@stayfarer.in',
+  },
+  // Image storage: Supabase Storage when both are set, else the local uploads/ folder.
+  storage: {
+    supabaseUrl: process.env.SUPABASE_URL,
+    supabaseKey: process.env.SUPABASE_SECRET_KEY,
+    bucket: process.env.SUPABASE_BUCKET || 'images',
   },
   // Same Razorpay account as web/server; admin only needs it to issue refunds.
   razorpay: {

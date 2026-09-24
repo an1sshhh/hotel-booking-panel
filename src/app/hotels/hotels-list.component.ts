@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { assetUrl } from '../shared/asset-url';
 import { Hotel, HotelService } from './hotel.service';
 import { IconComponent } from '../shared/icon.component';
 import { statusBadgeClass } from '../shared/status';
@@ -203,7 +203,7 @@ export class HotelsListComponent implements OnInit, OnDestroy {
   }
 
   imageUrl(path: string): string {
-    return `${environment.apiUrl}${path}`;
+    return assetUrl(path);
   }
 
   badgeClass = statusBadgeClass;

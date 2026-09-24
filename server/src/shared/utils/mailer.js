@@ -3,14 +3,51 @@ const config = require('../../config');
 
 let transporter = null;
 
+const useBrevo = () => Boolean(config.mail.brevoApiKey);
+
 function isMailConfigured() {
-  return Boolean(config.mail.user && config.mail.appPassword);
+  return useBrevo() ? Boolean(config.mail.from) : Boolean(config.mail.user && config.mail.appPassword);
 }
+
+/** "Name" <a@b.c> → { name, email } */
+function parseAddress(value) {
+  const m = /^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/.exec(String(value));
+  return m ? { name: m[1].trim() || undefined, email: m[2].trim() } : { email: String(value).trim() };
+}
+
+/**
+ * Brevo transactional email over HTTPS (port 443) — works where outbound SMTP
+ * is blocked. Accepts the same message shape as nodemailer's sendMail.
+ */
+const brevoTransport = {
+  async sendMail({ from, to, replyTo, subject, html, text }) {
+    const sender = parseAddress(from);
+    sender.email = config.mail.from; // Brevo only sends from a verified sender
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'api-key': config.mail.brevoApiKey, 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        sender,
+        to: [parseAddress(to)],
+        ...(replyTo ? { replyTo: parseAddress(replyTo) } : {}),
+        subject,
+        htmlContent: html,
+        ...(text ? { textContent: text } : {}),
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      throw new Error(`Brevo ${res.status}: ${body.slice(0, 300)}`);
+    }
+    return res.json().catch(() => ({}));
+  },
+};
 
 function getTransporter() {
   if (!isMailConfigured()) {
-    throw new Error('EMAIL_USER and EMAIL_APP_PASSWORD must be set to send email');
+    throw new Error('Email is not configured: set BREVO_API_KEY + EMAIL_FROM, or EMAIL_USER + EMAIL_APP_PASSWORD');
   }
+  if (useBrevo()) return brevoTransport;
   if (!transporter) {
     transporter = nodemailer.createTransport({
       service: 'gmail',

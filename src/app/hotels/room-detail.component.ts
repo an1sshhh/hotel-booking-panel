@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { environment } from '../../environments/environment';
+import { assetUrl } from '../shared/asset-url';
 import { InventoryRow, RatePlan, RoomImage, RoomService, RoomType } from './room.service';
 import { Amenity } from './hotel.service';
 import { AmenityService } from './amenity.service';
@@ -433,7 +433,7 @@ export class RoomDetailComponent implements OnInit {
   }
 
   fullUrl(path: string): string {
-    return `${environment.apiUrl}${path}`;
+    return assetUrl(path);
   }
 
   mealLabel(value: string): string {

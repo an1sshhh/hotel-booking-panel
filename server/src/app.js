@@ -1,15 +1,18 @@
-const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const { LOCAL_DIR } = require('./shared/utils/fileStore');
 const { requestId } = require('./middleware/requestId.middleware');
 const { ApiResponse, apiErrorHandler, notFoundHandler } = require('./core/ApiResponse');
 
 const app = express();
 
 app.use(requestId);
-app.use(cors());
+// CORS_ORIGINS (comma-separated) locks the API to the deployed frontends; unset = open, for local dev.
+const corsOrigins = (process.env.CORS_ORIGINS || '').split(',').map((o) => o.trim().replace(/\/$/, '')).filter(Boolean);
+app.use(cors(corsOrigins.length ? { origin: corsOrigins } : undefined));
 app.use(express.json());
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+// Local-dev image storage (hosted deployments use Supabase Storage; see shared/utils/fileStore).
+app.use('/uploads', express.static(LOCAL_DIR));
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 

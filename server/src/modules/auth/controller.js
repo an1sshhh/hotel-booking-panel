@@ -2,6 +2,14 @@ const { ApiResponse } = require('../../core/ApiResponse');
 const authService = require('./service');
 const { adminSignupSchema, adminLoginSchema, adminVerifyOtpSchema } = require('../../schema/adminAuth.schema');
 
+async function adminSignupStatus(req, res, next) {
+  try {
+    ApiResponse.success(res, { data: { open: await authService.isAdminSignupOpen() } });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function adminSignup(req, res, next) {
   try {
     const body = adminSignupSchema(req.body);
@@ -32,4 +40,4 @@ async function adminVerifyOtp(req, res, next) {
   }
 }
 
-module.exports = { adminSignup, adminLogin, adminVerifyOtp };
+module.exports = { adminSignupStatus, adminSignup, adminLogin, adminVerifyOtp };

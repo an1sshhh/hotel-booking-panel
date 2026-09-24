@@ -5,6 +5,7 @@ const config = require('../../config');
 const { findByEmail } = require('../../shared/utils/user');
 const { ApiError } = require('../../core/ApiError');
 const { sendOtpEmail } = require('../../shared/utils/mailer');
+const { isReservedAddress } = require('../../shared/email/service');
 
 /**
  * Guests log in against `users`, but bookings hang off `customers`.
@@ -44,7 +45,19 @@ function generateOtp() {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
 
+/**
+ * Self-signup only bootstraps the first admin; after that, admins are added from Admin Users.
+ * Seeded placeholder admins (example.com etc.) don't count — they can't receive a login OTP.
+ */
+async function isAdminSignupOpen() {
+  const admins = await db('users').where({ role: 'admin' }).pluck('email');
+  return !admins.some((email) => !isReservedAddress(email));
+}
+
 async function adminSignup({ name, email, password }) {
+  if (!(await isAdminSignupOpen())) {
+    throw ApiError.forbidden('Sign-up is closed. Ask an existing admin to add you from Admin Users.');
+  }
   const existing = await findByEmail(email);
   if (existing) {
     throw ApiError.conflict('An account with this email already exists');
@@ -102,4 +115,4 @@ async function adminVerifyOtp({ email, otp }) {
   return { token: issueToken(user, customer?.id), user: toPublicUser(user) };
 }
 
-module.exports = { adminSignup, adminLogin, adminVerifyOtp };
+module.exports = { isAdminSignupOpen, adminSignup, adminLogin, adminVerifyOtp };

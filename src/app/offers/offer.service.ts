@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { assetUrl } from '../shared/asset-url';
 
 export type OfferTheme = 'beach' | 'mountains' | 'city' | 'heritage' | 'forest' | 'festive';
 
@@ -78,6 +79,6 @@ export class OfferService {
   }
 
   imageUrl(path: string | null): string | null {
-    return path ? `${environment.apiUrl}${path}` : null;
+    return path ? assetUrl(path) : null;
   }
 }

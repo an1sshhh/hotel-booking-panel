@@ -1,10 +1,8 @@
-const path = require('path');
-const fs = require('fs/promises');
 const db = require('../../database/db');
 const { ApiError } = require('../../core/ApiError');
 const { logAction } = require('../../shared/utils/audit');
 const { hotelSchema, IMAGE_CATEGORIES } = require('../../schema/hotel.schema');
-const { uploadDir } = require('../../middleware/upload.middleware');
+const { saveUpload, removeUpload } = require('../../shared/utils/fileStore');
 
 /** Treats "", "undefined" and "null" as absent so a stray query param can't blank a list. */
 function filterParam(value) {
@@ -73,11 +71,12 @@ async function addHotelImage(hotelId, file, category) {
 
   const resolvedCategory = IMAGE_CATEGORIES.includes(category) ? category : 'other';
   const [{ maxOrder }] = await db('hotel_images').where({ hotel_id: hotelId }).max('sort_order as maxOrder');
+  const url = await saveUpload(file, `hotels/${hotelId}`);
 
   const [image] = await db('hotel_images')
     .insert({
       hotel_id: hotelId,
-      url: `/uploads/${file.filename}`,
+      url,
       category: resolvedCategory,
       sort_order: (maxOrder ?? -1) + 1,
     })
@@ -102,8 +101,9 @@ async function deleteImage(hotelId, imageId) {
   const [image] = await db('hotel_images').where({ id: imageId, hotel_id: hotelId }).del().returning('*');
   if (!image) throw ApiError.notFound('Image not found');
 
-  const filename = path.basename(image.url);
-  await fs.unlink(path.join(uploadDir, filename)).catch(() => {});
+  // If it was the cover photo, clear it so the hotel doesn't point at a deleted file.
+  await db('hotels').where({ id: hotelId, image_url: image.url }).update({ image_url: null });
+  await removeUpload(image.url);
 }
 
 async function updateAmenities(hotelId, amenityIds) {

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -11,7 +11,9 @@ import { AuthService } from './auth.service';
   templateUrl: './signup.component.html',
   styleUrl: './login.component.scss',
 })
-export class SignupComponent {
+export class SignupComponent implements OnInit {
+  /** null while checking; false once an admin exists (sign-up closed). */
+  signupOpen: boolean | null = null;
   name = '';
   email = '';
   password = '';
@@ -25,6 +27,19 @@ export class SignupComponent {
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
+
+  ngOnInit(): void {
+    this.auth.signupStatus().subscribe({
+      next: (s) => {
+        this.signupOpen = s.open;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.signupOpen = true; // let the server decide on submit
+        this.cdr.markForCheck();
+      },
+    });
+  }
 
   submit(): void {
     this.error = '';

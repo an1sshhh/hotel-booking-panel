@@ -22,6 +22,11 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
+  /** Self-signup stays open only until an admin with a real mailbox exists. */
+  signupStatus(): Observable<{ open: boolean }> {
+    return this.http.get<{ open: boolean }>(`${environment.apiUrl}/api/auth/admin/signup-status`);
+  }
+
   signup(name: string, email: string, password: string): Observable<AdminUser> {
     return this.http.post<AdminUser>(`${environment.apiUrl}/api/auth/admin/signup`, { name, email, password });
   }

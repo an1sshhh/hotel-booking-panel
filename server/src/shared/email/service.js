@@ -101,7 +101,7 @@ async function deliver({ to, audience, subject, html, text }) {
   const settings = await getEmailSettings();
   const fromName = audience === 'admin' ? settings.adminFromName : settings.guestFromName;
   await getTransporter().sendMail({
-    from: `"${fromName.replace(/"/g, '')}" <${config.mail.user}>`,
+    from: `"${fromName.replace(/"/g, '')}" <${config.mail.from}>`,
     to,
     replyTo: audience === 'guest' ? settings.replyTo || config.email.supportEmail : undefined,
     subject,
@@ -182,7 +182,7 @@ let warnedNoMail = false;
  */
 async function processOutbox(limit = 10) {
   if (!isMailConfigured()) {
-    if (!warnedNoMail) logger.warn('Email is not configured (EMAIL_USER / EMAIL_APP_PASSWORD) — queued emails will wait.');
+    if (!warnedNoMail) logger.warn('Email is not configured (BREVO_API_KEY + EMAIL_FROM, or EMAIL_USER + EMAIL_APP_PASSWORD) — queued emails will wait.');
     warnedNoMail = true;
     return 0;
   }

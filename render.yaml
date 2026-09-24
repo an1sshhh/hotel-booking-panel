@@ -1,0 +1,52 @@
+# Render Blueprint for the admin API (admin/server). The Angular panel itself is hosted on Vercel.
+# Secrets are marked sync: false — Render asks for them when the Blueprint is first applied.
+services:
+  - type: web
+    name: stayfarer-admin-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: server
+    buildCommand: npm ci --omit=dev
+    startCommand: node src/index.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: DB_SSL
+        value: "true"
+      - key: DB_SSL_CA_FILE
+        value: certs/supabase-ca.crt
+      - key: DB_POOL_MAX
+        value: "5"
+      - key: JWT_SECRET # must match the guest API's JWT_SECRET
+        sync: false
+      # Email via Brevo's HTTPS API (Render's free plan blocks SMTP)
+      - key: BREVO_API_KEY
+        sync: false
+      - key: EMAIL_FROM # a sender verified in Brevo
+        sync: false
+      # Image uploads go to Supabase Storage (the server's disk is wiped on every deploy)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: SITE_URL # Vercel URL of the website (used in email links)
+        sync: false
+      - key: ADMIN_URL # Vercel URL of this admin panel
+        sync: false
+      - key: SUPPORT_EMAIL
+        value: support@stayfarer.in
+      - key: CORS_ORIGINS # same as ADMIN_URL
+        sync: false

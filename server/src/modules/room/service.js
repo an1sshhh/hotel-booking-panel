@@ -1,8 +1,6 @@
-const path = require('path');
-const fs = require('fs/promises');
 const db = require('../../database/db');
 const { ApiError } = require('../../core/ApiError');
-const { uploadDir } = require('../../middleware/upload.middleware');
+const { saveUpload, removeUpload } = require('../../shared/utils/fileStore');
 
 const ROOM_FIELDS = [
   'name', 'description', 'size_label', 'bed_type',
@@ -70,11 +68,12 @@ async function updateRoomType(id, body) {
 
 async function addRoomImage(roomTypeId, file, category = 'other') {
   const [{ maxOrder }] = await db('room_images').where({ room_type_id: roomTypeId }).max('sort_order as maxOrder');
+  const url = await saveUpload(file, `rooms/${roomTypeId}`);
 
   const [image] = await db('room_images')
     .insert({
       room_type_id: roomTypeId,
-      url: `/uploads/${file.filename}`,
+      url,
       category,
       sort_order: (maxOrder ?? -1) + 1,
     })
@@ -98,8 +97,7 @@ async function deleteImage(roomTypeId, imageId) {
   const [image] = await db('room_images').where({ id: imageId, room_type_id: roomTypeId }).del().returning('*');
   if (!image) throw ApiError.notFound('Image not found');
 
-  const filename = path.basename(image.url);
-  await fs.unlink(path.join(uploadDir, filename)).catch(() => {});
+  await removeUpload(image.url);
 }
 
 async function updateAmenities(roomTypeId, amenityIds = []) {

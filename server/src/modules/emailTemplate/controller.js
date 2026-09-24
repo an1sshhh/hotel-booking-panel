@@ -13,7 +13,7 @@ const handle = (fn) => async (req, res, next) => {
 
 /** Read-only facts about the mail setup, shown on the Settings tab. */
 function deliveryInfo() {
-  return { mailConfigured: isMailConfigured(), senderAddress: config.mail.user || null, siteUrl: config.email.siteUrl, supportEmail: config.email.supportEmail };
+  return { mailConfigured: isMailConfigured(), senderAddress: config.mail.from || null, emailProvider: config.mail.brevoApiKey ? 'Brevo' : 'Gmail SMTP', siteUrl: config.email.siteUrl, supportEmail: config.email.supportEmail };
 }
 
 module.exports = {

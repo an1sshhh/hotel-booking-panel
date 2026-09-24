@@ -1,4 +1,4 @@
-// Set this to the public URL of the admin API before running a production build.
+// Public URL of the admin API on Render (see render.yaml). Change it if Render gave the service a different URL.
 export const environment = {
-  apiUrl: 'REPLACE_WITH_PRODUCTION_API_URL',
+  apiUrl: 'https://stayfarer-admin-api.onrender.com',
 };

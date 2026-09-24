@@ -5,6 +5,15 @@
       <span class="brand-name">Stayfarer</span>
     </div>
 
+    @if (signupOpen === false) {
+    <div class="login-card">
+      <div class="login-head">
+        <h1>Sign-up is closed</h1>
+        <p>Admin accounts are created by an existing admin from <strong>Admin Users</strong>. Ask them to add you, then sign in.</p>
+      </div>
+      <a class="btn btn-primary login-submit" routerLink="/login">Go to sign in</a>
+    </div>
+    } @else {
     <form class="login-card" (ngSubmit)="submit()">
       <div class="login-head">
         <h1>Create account</h1>
@@ -52,6 +61,7 @@
 
       <p class="login-foot"><a routerLink="/login">Already have an account? Sign in</a></p>
     </form>
+    }
 
     <p class="login-foot">Stayfarer Hotel Booking Platform</p>
   </div>

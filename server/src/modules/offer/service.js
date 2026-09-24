@@ -2,6 +2,7 @@ const db = require('../../database/db');
 const { ApiError } = require('../../core/ApiError');
 const { logAction } = require('../../shared/utils/audit');
 const { offerSchema } = require('../../schema/offer.schema');
+const { saveUpload, removeUpload } = require('../../shared/utils/fileStore');
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -80,6 +81,7 @@ async function deleteOffer(id, adminUserId) {
   const existing = await db('offers').where({ id }).first();
   if (!existing) throw ApiError.notFound('Offer not found');
   await db('offers').where({ id }).del();
+  await removeUpload(existing.image_url);
   await logAction({ adminUserId, action: 'offer.deleted', entityType: 'offer', entityId: id, before: existing });
 }
 
@@ -87,7 +89,9 @@ async function setOfferImage(id, file, adminUserId) {
   if (!file) throw ApiError.badRequest('Image file is required');
   const existing = await db('offers').where({ id }).first();
   if (!existing) throw ApiError.notFound('Offer not found');
-  await db('offers').where({ id }).update({ image_url: `/uploads/${file.filename}`, updated_at: db.fn.now() });
+  const url = await saveUpload(file, 'offers');
+  await db('offers').where({ id }).update({ image_url: url, updated_at: db.fn.now() });
+  await removeUpload(existing.image_url); // the banner it replaced
   await logAction({ adminUserId, action: 'offer.image_updated', entityType: 'offer', entityId: id });
   return getOffer(id);
 }
@@ -96,6 +100,7 @@ async function removeOfferImage(id, adminUserId) {
   const existing = await db('offers').where({ id }).first();
   if (!existing) throw ApiError.notFound('Offer not found');
   await db('offers').where({ id }).update({ image_url: null, updated_at: db.fn.now() });
+  await removeUpload(existing.image_url);
   await logAction({ adminUserId, action: 'offer.image_removed', entityType: 'offer', entityId: id });
   return getOffer(id);
 }
