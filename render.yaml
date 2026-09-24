@@ -28,10 +28,12 @@ services:
         value: "5"
       - key: JWT_SECRET # must match the guest API's JWT_SECRET
         sync: false
-      # Email via Brevo's HTTPS API (Render's free plan blocks SMTP)
-      - key: BREVO_API_KEY
+      # Email via the Gmail relay script over HTTPS (Render's free plan blocks SMTP)
+      - key: GMAIL_SCRIPT_URL # the web app's /exec URL (see server/scripts/gmail-relay.gs)
         sync: false
-      - key: EMAIL_FROM # a sender verified in Brevo
+      - key: GMAIL_SCRIPT_SECRET # same value as SECRET in the script
+        sync: false
+      - key: EMAIL_FROM # the Gmail address that owns the script
         sync: false
       # Image uploads go to Supabase Storage (the server's disk is wiped on every deploy)
       - key: SUPABASE_URL

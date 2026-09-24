@@ -26,7 +26,7 @@ Admin login is email + password followed by an emailed OTP. Self sign-up at `/si
 |---|---|---|
 | Database | Supabase (session pooler, port 5432) | `DATABASE_URL`, `DATABASE_PASSWORD` |
 | Images | Supabase Storage, public bucket `images` | `SUPABASE_URL`, `SUPABASE_SECRET_KEY` |
-| Email | Brevo HTTPS API (Render's free plan blocks SMTP) | `BREVO_API_KEY`, `EMAIL_FROM` |
+| Email | Your Gmail via a Google Apps Script relay over HTTPS ([`server/scripts/gmail-relay.gs`](server/scripts/gmail-relay.gs)); Render's free plan blocks SMTP | `GMAIL_SCRIPT_URL`, `GMAIL_SCRIPT_SECRET`, `EMAIL_FROM` |
 | API (`server/`) | Render — [`render.yaml`](render.yaml) | set the `sync: false` vars in the Render dashboard |
 | Panel | Vercel — [`vercel.json`](vercel.json) | API URL in `src/environments/environment.prod.ts` |
 

@@ -3,10 +3,10 @@ const config = require('../../config');
 
 let transporter = null;
 
-const useBrevo = () => Boolean(config.mail.brevoApiKey);
+const useGmailScript = () => Boolean(config.mail.scriptUrl);
 
 function isMailConfigured() {
-  return useBrevo() ? Boolean(config.mail.from) : Boolean(config.mail.user && config.mail.appPassword);
+  return useGmailScript() ? Boolean(config.mail.scriptSecret) : Boolean(config.mail.user && config.mail.appPassword);
 }
 
 /** "Name" <a@b.c> → { name, email } */
@@ -16,38 +16,44 @@ function parseAddress(value) {
 }
 
 /**
- * Brevo transactional email over HTTPS (port 443) — works where outbound SMTP
- * is blocked. Accepts the same message shape as nodemailer's sendMail.
+ * Sends through the Google Apps Script web app in scripts/gmail-relay.gs over HTTPS
+ * (port 443) — for hosts that block outbound SMTP, like Render's free plan. The mail
+ * still goes out from the Gmail account that owns the script. Same shape as nodemailer's sendMail.
  */
-const brevoTransport = {
+const gmailScriptTransport = {
   async sendMail({ from, to, replyTo, subject, html, text }) {
-    const sender = parseAddress(from);
-    sender.email = config.mail.from; // Brevo only sends from a verified sender
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    const res = await fetch(config.mail.scriptUrl, {
       method: 'POST',
-      headers: { 'api-key': config.mail.brevoApiKey, 'Content-Type': 'application/json', Accept: 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        sender,
-        to: [parseAddress(to)],
-        ...(replyTo ? { replyTo: parseAddress(replyTo) } : {}),
+        secret: config.mail.scriptSecret,
+        to: parseAddress(to).email,
+        name: parseAddress(from).name,
+        ...(replyTo ? { replyTo: parseAddress(replyTo).email } : {}),
         subject,
-        htmlContent: html,
-        ...(text ? { textContent: text } : {}),
+        html,
+        text,
       }),
+      signal: AbortSignal.timeout(60000), // Apps Script cold starts can take ~20s
     });
-    if (!res.ok) {
-      const body = await res.text().catch(() => '');
-      throw new Error(`Brevo ${res.status}: ${body.slice(0, 300)}`);
+    const body = await res.text();
+    let data;
+    try {
+      data = JSON.parse(body);
+    } catch {
+      // Google answers with an HTML page when the URL is wrong or the web app isn't open to "Anyone".
+      throw new Error(`Gmail relay returned ${res.status} (not JSON) — check GMAIL_SCRIPT_URL and that the web app's access is "Anyone"`);
     }
-    return res.json().catch(() => ({}));
+    if (!data.ok) throw new Error(`Gmail relay: ${data.error}`);
+    return data;
   },
 };
 
 function getTransporter() {
   if (!isMailConfigured()) {
-    throw new Error('Email is not configured: set BREVO_API_KEY + EMAIL_FROM, or EMAIL_USER + EMAIL_APP_PASSWORD');
+    throw new Error('Email is not configured: set GMAIL_SCRIPT_URL + GMAIL_SCRIPT_SECRET, or EMAIL_USER + EMAIL_APP_PASSWORD');
   }
-  if (useBrevo()) return brevoTransport;
+  if (useGmailScript()) return gmailScriptTransport;
   if (!transporter) {
     transporter = nodemailer.createTransport({
       service: 'gmail',

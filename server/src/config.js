@@ -7,11 +7,13 @@ const config = {
   jwtSecret: process.env.JWT_SECRET,
   knex: knexConfig,
   mail: {
-    // Gmail SMTP (local dev). Hosts that block SMTP (e.g. Render free) use Brevo's HTTPS API instead.
+    // Gmail SMTP (local dev). Hosts that block SMTP (e.g. Render free) use the Gmail
+    // relay script (scripts/gmail-relay.gs) over HTTPS instead.
     user: process.env.EMAIL_USER,
     appPassword: process.env.EMAIL_APP_PASSWORD,
-    brevoApiKey: process.env.BREVO_API_KEY,
-    // The sender address: must be a verified sender in Brevo. Defaults to EMAIL_USER.
+    scriptUrl: process.env.GMAIL_SCRIPT_URL,
+    scriptSecret: process.env.GMAIL_SCRIPT_SECRET,
+    // Shown as the sender; with the relay, mail always comes from the script owner's Gmail.
     from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
   },
   // Links and contact details used inside emails.

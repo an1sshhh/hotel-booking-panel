@@ -182,7 +182,7 @@ let warnedNoMail = false;
  */
 async function processOutbox(limit = 10) {
   if (!isMailConfigured()) {
-    if (!warnedNoMail) logger.warn('Email is not configured (BREVO_API_KEY + EMAIL_FROM, or EMAIL_USER + EMAIL_APP_PASSWORD) — queued emails will wait.');
+    if (!warnedNoMail) logger.warn('Email is not configured (GMAIL_SCRIPT_URL + GMAIL_SCRIPT_SECRET, or EMAIL_USER + EMAIL_APP_PASSWORD) — queued emails will wait.');
     warnedNoMail = true;
     return 0;
   }
