@@ -1,0 +1,58 @@
+<div class="login-page">
+  <div class="login-panel">
+    <div class="login-brand">
+      <span class="brand-mark">SF</span>
+      <span class="brand-name">Stayfarer</span>
+    </div>
+
+    <form class="login-card" (ngSubmit)="submit()">
+      <div class="login-head">
+        <h1>Create account</h1>
+        <p>Sign up for admin panel access.</p>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="name">Name</label>
+        <input id="name" class="input" type="text" name="name" [(ngModel)]="name" required autocomplete="name" />
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="email">Email</label>
+        <input id="email" class="input" type="email" name="email" [(ngModel)]="email" required autocomplete="username" />
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="password">Password</label>
+        <input id="password" class="input" type="password" name="password" [(ngModel)]="password" required autocomplete="new-password" />
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="confirmPassword">Confirm password</label>
+        <input
+          id="confirmPassword"
+          class="input"
+          type="password"
+          name="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          required
+          autocomplete="new-password"
+        />
+      </div>
+
+      @if (error) {
+        <div class="alert alert-danger">{{ error }}</div>
+      }
+      @if (success) {
+        <div class="alert alert-success">Account created. Redirecting to sign in…</div>
+      }
+
+      <button class="btn btn-primary login-submit" type="submit" [disabled]="loading || success">
+        {{ loading ? 'Creating account…' : 'Sign up' }}
+      </button>
+
+      <p class="login-foot"><a routerLink="/login">Already have an account? Sign in</a></p>
+    </form>
+
+    <p class="login-foot">Stayfarer Hotel Booking Platform</p>
+  </div>
+</div>

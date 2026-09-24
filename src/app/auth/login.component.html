@@ -1,0 +1,71 @@
+<div class="login-page">
+  <div class="login-panel">
+    <div class="login-brand">
+      <span class="brand-mark">SF</span>
+      <span class="brand-name">Stayfarer</span>
+    </div>
+
+    @if (step === 'credentials') {
+      <form class="login-card" (ngSubmit)="submitCredentials()">
+        <div class="login-head">
+          <h1>Sign in</h1>
+          <p>Enter your credentials to access the admin panel.</p>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="email">Email</label>
+          <input id="email" class="input" type="email" name="email" [(ngModel)]="email" required autocomplete="username" />
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="password">Password</label>
+          <input id="password" class="input" type="password" name="password" [(ngModel)]="password" required autocomplete="current-password" />
+        </div>
+
+        @if (error) {
+          <div class="alert alert-danger">{{ error }}</div>
+        }
+
+        <button class="btn btn-primary login-submit" type="submit" [disabled]="loading">
+          {{ loading ? 'Sending code…' : 'Continue' }}
+        </button>
+
+        <p class="login-foot"><a routerLink="/signup">Don't have an account? Sign up</a></p>
+      </form>
+    } @else {
+      <form class="login-card" (ngSubmit)="submitOtp()">
+        <div class="login-head">
+          <h1>Enter code</h1>
+          <p>We sent a 6-digit code to {{ email }}.</p>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="otp">Verification code</label>
+          <input
+            id="otp"
+            class="input"
+            type="text"
+            name="otp"
+            inputmode="numeric"
+            maxlength="6"
+            [(ngModel)]="otp"
+            required
+            autocomplete="one-time-code"
+          />
+        </div>
+
+        @if (error) {
+          <div class="alert alert-danger">{{ error }}</div>
+        }
+
+        <button class="btn btn-primary login-submit" type="submit" [disabled]="loading || otp.length !== 6">
+          {{ loading ? 'Verifying…' : 'Verify & Sign in' }}
+        </button>
+
+        <p class="login-foot"><a (click)="backToCredentials()">Use a different account</a></p>
+      </form>
+    }
+
+    <p class="login-foot">Stayfarer Hotel Booking Platform</p>
+  </div>
+</div>
