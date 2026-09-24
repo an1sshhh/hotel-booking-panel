@@ -268,7 +268,7 @@ const NEXT_ACTIONS: Record<string, { label: string; status: string; danger?: boo
         align-items: flex-start;
         gap: 10px;
         flex: 1;
-        min-width: 160px;
+        min-width: min(140px, 100%);
         padding: 12px;
         border: 1px solid var(--border);
         border-radius: var(--r-md);

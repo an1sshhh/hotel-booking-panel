@@ -157,11 +157,11 @@ type Tab = 'details' | 'images' | 'amenities' | 'inventory' | 'rates';
           <div class="card" style="margin-bottom: 16px;">
             <div class="card-header"><span class="card-title">Set Availability</span></div>
             <div class="card-body">
-              <div class="row wrap" style="gap: 12px; align-items: flex-end;">
+              <div class="row wrap inv-form">
                 <div class="field"><label class="field-label">From</label><input class="input" type="date" [(ngModel)]="invFrom" /></div>
                 <div class="field"><label class="field-label">To</label><input class="input" type="date" [(ngModel)]="invTo" /></div>
                 <div class="field"><label class="field-label">Rooms available per night</label>
-                  <input class="input" type="number" min="0" [(ngModel)]="invTotal" style="width: 180px;" /></div>
+                  <input class="input inv-total" type="number" min="0" [(ngModel)]="invTotal" /></div>
                 <button class="btn btn-primary" (click)="applyInventory()">Apply to range</button>
                 <button class="btn btn-secondary" (click)="loadInventory()"><app-icon name="refresh" [size]="14" /> Refresh</button>
               </div>
@@ -337,7 +337,18 @@ type Tab = 'details' | 'images' | 'amenities' | 'inventory' | 'rates';
       </div>
     }
   `,
-  styles: [`.amenity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }`],
+  styles: [
+    `
+      .amenity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(190px, 100%), 1fr)); gap: 8px; }
+      .inv-form { gap: 12px; align-items: flex-end; }
+      .inv-total { width: 180px; }
+      @media (max-width: 640px) {
+        .inv-form > .field { flex: 1 1 140px; }
+        .inv-form > .btn { flex: 1 1 auto; }
+        .inv-total { width: 100%; }
+      }
+    `,
+  ],
 })
 export class RoomDetailComponent implements OnInit {
   room: RoomType | null = null;

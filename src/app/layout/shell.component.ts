@@ -34,6 +34,9 @@ interface NavGroup {
             <span class="brand-name">Stayfarer</span>
             <span class="brand-sub">Admin Panel</span>
           </span>
+          <button class="icon-btn nav-close" aria-label="Close menu" (click)="setNav(false)">
+            <app-icon name="x" [size]="18" />
+          </button>
         </div>
 
         <nav class="nav">
@@ -46,7 +49,7 @@ interface NavGroup {
                   [routerLink]="item.link"
                   routerLinkActive="active"
                   [routerLinkActiveOptions]="{ exact: !!item.exact }"
-                  (click)="mobileNavOpen = false"
+                  (click)="setNav(false)"
                 >
                   <app-icon [name]="item.icon" [size]="17" [strokeWidth]="1.9" />
                   <span>{{ item.label }}</span>
@@ -74,13 +77,13 @@ interface NavGroup {
       </aside>
 
       @if (mobileNavOpen) {
-        <div class="nav-scrim" (click)="mobileNavOpen = false"></div>
+        <div class="nav-scrim" (click)="setNav(false)"></div>
       }
 
       <div class="main">
         <header class="topbar">
-          <button class="icon-btn menu-btn" (click)="mobileNavOpen = !mobileNavOpen">
-            <app-icon name="dashboard" [size]="18" />
+          <button class="icon-btn menu-btn" aria-label="Open menu" [attr.aria-expanded]="mobileNavOpen" (click)="setNav(!mobileNavOpen)">
+            <app-icon name="menu" [size]="20" />
           </button>
           <div class="crumb">{{ currentSection }}</div>
           <div class="topbar-right">
@@ -239,17 +242,24 @@ interface NavGroup {
         background: var(--danger-600);
       }
 
-      .menu-btn { display: none; }
+      .menu-btn, .nav-close { display: none; }
       .nav-scrim { display: none; }
 
       .content { flex: 1; min-width: 0; }
 
       @media (max-width: 900px) {
-        .sidebar { transform: translateX(-100%); transition: transform .2s ease; }
-        .sidebar.open { transform: none; }
+        .sidebar {
+          width: min(var(--sidebar-w), 84vw);
+          transform: translateX(-100%);
+          transition: transform .2s ease;
+        }
+        .sidebar.open { transform: none; box-shadow: var(--shadow-lg); }
         .main { margin-left: 0; }
-        .menu-btn { display: grid; }
+        .menu-btn { display: grid; width: 36px; height: 36px; margin-left: -6px; }
+        .nav-close { display: grid; margin-left: auto; color: var(--gray-500); }
+        .nav-close:hover { color: #fff; background: rgba(255,255,255,.07); }
         .topbar { padding: 0 16px; }
+        .crumb { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
         .nav-scrim {
           display: block;
           position: fixed;
@@ -318,7 +328,10 @@ export class ShellComponent implements OnInit {
   ngOnInit(): void {
     this.syncSection(this.router.url);
     this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
-      .subscribe((e) => this.syncSection(e.urlAfterRedirects));
+      .subscribe((e) => {
+        this.syncSection(e.urlAfterRedirects);
+        if (this.mobileNavOpen) this.setNav(false);
+      });
 
     this.notificationService.list(true).subscribe({
       next: (list) => {
@@ -339,7 +352,14 @@ export class ShellComponent implements OnInit {
     this.currentSection = match?.label ?? 'Dashboard';
   }
 
+  /** Opens/closes the mobile drawer; the page behind it doesn't scroll while it's open. */
+  setNav(open: boolean): void {
+    this.mobileNavOpen = open;
+    document.body.classList.toggle('nav-open', open);
+  }
+
   logout(): void {
+    this.setNav(false);
     this.auth.logout();
     this.router.navigate(['/login']);
   }

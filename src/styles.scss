@@ -68,6 +68,9 @@
 
 html, body { height: 100%; }
 
+/* Stop iOS inflating text in landscape. */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
 body {
   margin: 0;
   background: var(--bg-app);
@@ -124,7 +127,7 @@ svg { flex-shrink: 0; }
   color: var(--text-muted);
 }
 
-.page-actions { display: flex; gap: 8px; align-items: center; }
+.page-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
 .section { margin-top: 28px; }
 
@@ -510,7 +513,7 @@ table.table tbody tr.clickable:hover { background: var(--gray-50); }
 
 .stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
   gap: 14px;
 }
 
@@ -785,8 +788,14 @@ table.table tbody tr.clickable:hover { background: var(--gray-50); }
   gap: 6px;
   height: 170px;
   padding-top: 8px;
+  container-type: inline-size;
 }
-.chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 7px; min-width: 0; }
+/* Narrow chart (phone, or the half-width dashboard card): every other date label so they don't collide. */
+@container (max-width: 640px) {
+  .chart-col:nth-child(even) .chart-label { visibility: hidden; }
+}
+/* Full height, so each bar's percentage height resolves against the plot instead of collapsing to min-height. */
+.chart-col { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 7px; min-width: 0; }
 .chart-bar {
   width: 100%;
   max-width: 40px;
@@ -821,16 +830,18 @@ table.table tbody tr.clickable:hover { background: var(--gray-50); }
 
 .muted { color: var(--text-muted); }
 .strong { font-weight: 600; color: var(--text-primary); }
-.stack { display: flex; flex-direction: column; gap: 4px; }
+/* Long unbroken values (emails, payment IDs) break instead of spilling out of the column. */
+.stack { display: flex; flex-direction: column; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
 .row { display: flex; align-items: center; gap: 8px; }
 .row-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .wrap { flex-wrap: wrap; }
-.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 16px; }
 .mt-0 { margin-top: 0; } .mt-8 { margin-top: 8px; } .mt-16 { margin-top: 16px; } .mt-24 { margin-top: 24px; }
 
 .definition-list { display: grid; grid-template-columns: auto 1fr; gap: 9px 20px; font-size: 13.5px; }
 .definition-list dt { color: var(--text-muted); }
-.definition-list dd { margin: 0; color: var(--text-primary); font-weight: 500; }
+/* Emails, URLs and addresses wrap inside the value column instead of overflowing the card. */
+.definition-list dd { margin: 0; min-width: 0; overflow-wrap: anywhere; color: var(--text-primary); font-weight: 500; }
 
 .price-line {
   display: flex;
@@ -878,4 +889,74 @@ table.table tbody tr.clickable:hover { background: var(--gray-50); }
   table.table th, table.table td { padding-left: 10px; padding-right: 10px; }
   table.table th { white-space: normal; }
   .page { padding-left: 20px; padding-right: 20px; }
+}
+
+/* ---------- Tablets & phones ------------------------------------------- */
+
+@media (max-width: 900px) {
+  .page { padding: 20px 16px 40px; }
+  body.nav-open { overflow: hidden; }
+}
+
+@media (max-width: 768px) {
+  /* On a phone there's no room to fit every column, so tables scroll sideways
+     instead: rows stay on one line rather than breaking words letter by letter.
+     Cells holding prose opt back into wrapping with .cell-wrap. */
+  table.table th, table.table td { white-space: nowrap; overflow-wrap: normal; }
+  table.table td.cell-wrap { white-space: normal; overflow-wrap: anywhere; min-width: 220px; }
+  table.table td .empty-state { white-space: normal; }
+
+  /* 16px keeps iOS Safari from zooming the page when a field gets focus. */
+  .input, .select, .textarea { font-size: 16px; }
+
+  .card-header, .section-header { flex-wrap: wrap; }
+  .pagination { flex-wrap: wrap; justify-content: center; }
+}
+
+@media (max-width: 640px) {
+  .page-header { margin-bottom: 16px; }
+  .page-title { font-size: 20px; }
+  .page-subtitle { overflow-wrap: anywhere; }
+  .section { margin-top: 22px; }
+
+  .card-header { padding: 12px 14px; }
+  .card-body { padding: 14px; }
+
+  /* Filters: search takes the full row, the rest share the next one. */
+  .search-field { flex: 1 1 100%; min-width: 0; max-width: none; }
+  .toolbar > .select, .toolbar > .input { flex: 1 1 140px; min-width: 0; }
+
+  .row-between { flex-wrap: wrap; }
+
+  /* Two stats per row, icon above the number so large values still fit. */
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .stat-card { flex-direction: column; gap: 10px; padding: 14px; }
+  .stat-value { font-size: 20px; overflow-wrap: anywhere; }
+
+  .gallery { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+
+  /* Wizard steps: a tidy 2×2 grid instead of a ragged wrap. */
+  .steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .step { justify-content: flex-start; padding: 9px 10px; text-align: left; }
+
+  /* Dialogs use the whole width and their buttons stack into full-width rows. */
+  .modal-backdrop { padding: 16px 10px; }
+  .modal-header, .modal-body { padding-left: 16px; padding-right: 16px; }
+  .modal-footer { flex-wrap: wrap; padding: 12px 16px; }
+  .modal-footer > .btn { flex: 1 1 auto; }
+  .modal-footer > .alert, .modal-footer > .field-error { flex-basis: 100%; margin-right: 0 !important; }
+
+  .toast-stack { left: 12px; right: 12px; bottom: 12px; }
+  .toast { min-width: 0; max-width: none; }
+}
+
+@media (max-width: 480px) {
+  /* Label above value — two columns leave too little room for the value. */
+  .definition-list { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .definition-list dd { margin-bottom: 10px; }
+  .definition-list dd:last-of-type { margin-bottom: 0; }
+
+  .stat-grid { gap: 8px; }
+  .stat-card { padding: 12px; }
+  .stat-value { font-size: 18px; }
 }

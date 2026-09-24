@@ -73,9 +73,9 @@ const RANGES = [
               <div class="card-title">Revenue Overview</div>
               <div class="cell-muted">{{ revenueTotalLabel }}</div>
             </div>
-            <select class="select" style="width: auto;" [value]="rangeDays" (change)="changeRange($event)">
+            <select class="select" style="width: auto;" (change)="changeRange($event)">
               @for (range of ranges; track range.days) {
-                <option [value]="range.days">{{ range.label }}</option>
+                <option [value]="range.days" [selected]="range.days === rangeDays">{{ range.label }}</option>
               }
             </select>
           </div>

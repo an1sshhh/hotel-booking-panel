@@ -257,7 +257,7 @@ const emptyDraft = (): Draft => ({
   styles: [
     `
       .tab-count { margin-left: 4px; font-size: 11px; color: var(--text-muted); }
-      .offer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 16px; }
+      .offer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr)); gap: 16px; }
       .offer-card { overflow: hidden; display: flex; flex-direction: column; }
       .offer-card.muted .banner { filter: saturate(.55); }
       .offer-meta { display: flex; flex-direction: column; gap: 8px; }
@@ -272,14 +272,14 @@ const emptyDraft = (): Draft => ({
       .banner .status { position: absolute; top: 10px; right: 10px; }
       .offer-modal { max-width: 980px; }
       .offer-form { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; }
-      @media (max-width: 860px) { .offer-form { grid-template-columns: 1fr; } }
+      @media (max-width: 860px) { .offer-form { grid-template-columns: minmax(0, 1fr); } .preview { position: static; } }
       .preview { position: sticky; top: 0; align-self: start; }
       .preview-banner { height: 200px; border-radius: 14px; margin-top: 6px; }
       .preview-foot { display: flex; gap: 8px; align-items: center; margin-top: 6px; }
       .preview-code { font-family: ui-monospace, monospace; font-size: 12px; font-weight: 700; border: 1px dashed rgba(255,255,255,.8); padding: 2px 8px; border-radius: 6px; }
       .preview-cta { font-size: 12px; font-weight: 700; background: #f2682f; padding: 4px 10px; border-radius: 8px; }
       .theme-row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
-      @media (max-width: 600px) { .theme-row { grid-template-columns: repeat(3, 1fr); } }
+      @media (max-width: 600px) { .theme-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } .preview-banner { height: 170px; } }
       .theme-swatch { height: 54px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; position: relative; padding: 0;
                       display: flex; align-items: flex-end; justify-content: center; color: #fff; font-size: 11px; font-weight: 700;
                       text-shadow: 0 1px 2px rgba(0,0,0,.5); }

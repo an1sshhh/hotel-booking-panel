@@ -307,7 +307,7 @@ function presetRange(preset: string): { from: string; to: string } {
       .rp-search.sm { width: 240px; max-width: 100%; margin: 0; }
       .rp-switch { position: relative; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
       .rp-switch-btn { display: inline-flex; align-items: baseline; gap: 8px; border: 1px solid var(--border); background: var(--bg-surface, #fff);
-                       border-radius: 10px; padding: 6px 12px; cursor: pointer; color: inherit; max-width: 100%; }
+                       border-radius: 10px; padding: 6px 12px; cursor: pointer; color: inherit; max-width: 100%; text-align: left; }
       .rp-switch-btn:hover { border-color: var(--brand-500); background: var(--brand-50); }
       .rp-crumb { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); white-space: nowrap; }
       .rp-caret { color: var(--brand-600); font-size: 12px; }
@@ -315,7 +315,7 @@ function presetRange(preset: string): { from: string; to: string } {
       .rp-menu { position: absolute; top: calc(100% + 6px); left: 0; z-index: 31; width: min(920px, calc(100vw - var(--sidebar-w) - 80px));
                  background: var(--bg-surface, #fff); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); padding: 12px;
                  max-height: 70vh; overflow: auto; }
-      .rp-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 4px 16px; }
+      .rp-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(270px, 100%), 1fr)); gap: 4px 16px; }
       .rp-item-desc { font-size: 11.5px; color: var(--text-muted); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .rp-group { padding-top: 4px; }
       .rp-group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--text-muted); padding: 6px 8px; }
@@ -348,7 +348,7 @@ function presetRange(preset: string): { from: string; to: string } {
       .rp-dropdown button { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; width: 100%; padding: 8px 10px; border: 0; background: none; cursor: pointer; text-align: left; font-size: 13px; }
       .rp-dropdown button:hover { background: var(--brand-50); }
       .rp-subject { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
-      .rp-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+      .rp-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 12px; }
       .rp-tile { padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
       .rp-tile-label { font-size: 11.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
       .rp-tile-value { font-size: 20px; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -363,7 +363,26 @@ function presetRange(preset: string): { from: string; to: string } {
       .rp-table th.rp-sortable:hover { color: var(--text-primary); }
       .rp-sort { margin-left: 3px; font-size: 9px; }
       .rp-table tfoot td { font-weight: 700; color: var(--text-primary); background: var(--brand-50); border-top: 2px solid var(--brand-100); }
-      .rp-pager { padding: 10px 14px; border-top: 1px solid var(--border); }
+      .rp-pager { padding: 10px 14px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+
+      /* Below the sidebar breakpoint the sidebar is off-canvas, so the menu can't be sized against it:
+         pin it under the top bar and let it span the screen. */
+      @media (max-width: 900px) {
+        .rp-menu { position: fixed; top: calc(var(--topbar-h) + 8px); left: 12px; right: 12px; width: auto;
+                   max-height: calc(100vh - var(--topbar-h) - 24px); max-height: calc(100dvh - var(--topbar-h) - 24px); }
+      }
+      @media (max-width: 640px) {
+        .rp-title { font-size: 16px; }
+        .rp-actions { width: 100%; }
+        .rp-actions .btn { flex: 1 1 auto; }
+        .rp-field, .rp-date, .rp-num { flex: 1 1 140px; min-width: 0; max-width: none; }
+        .rp-customer { flex-basis: 100%; min-width: 0; }
+        .rp-search.sm { width: 100%; }
+        .rp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .rp-tile { padding: 12px; }
+        .rp-tile-value { font-size: 17px; }
+        .rp-item-desc { white-space: normal; }
+      }
     `,
   ],
 })

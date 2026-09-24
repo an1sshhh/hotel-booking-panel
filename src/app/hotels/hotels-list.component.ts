@@ -110,7 +110,7 @@ import { statusBadgeClass } from '../shared/status';
     `
       .hotel-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(252px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(252px, 100%), 1fr));
         gap: 16px;
       }
 

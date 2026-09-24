@@ -191,8 +191,8 @@ const LOG_STATUSES: { value: LogStatus; label: string }[] = [
               </button>
             }
           </div>
-          <div class="row wrap" style="gap: 8px;">
-            <select class="select" style="max-width: 240px;" [(ngModel)]="logTemplate" (ngModelChange)="logPage = 1; loadLog()">
+          <div class="row wrap et-log-filters">
+            <select class="select et-log-select" [(ngModel)]="logTemplate" (ngModelChange)="logPage = 1; loadLog()">
               <option value="">All emails</option>
               @for (t of emails; track t.key) { <option [value]="t.key">{{ t.name }}</option> }
             </select>
@@ -214,9 +214,9 @@ const LOG_STATUSES: { value: LogStatus; label: string }[] = [
                     <td class="num cell-muted" style="white-space: nowrap;">{{ (row.sent_at || row.created_at) | date: 'MMM d, h:mm a' }}</td>
                     <td>{{ nameOf(row.template_key) }}</td>
                     <td class="cell-mono">{{ row.to_email }}</td>
-                    <td class="cell-muted" style="max-width: 300px;">{{ row.subject || '—' }}</td>
+                    <td class="cell-muted cell-wrap" style="max-width: 300px;">{{ row.subject || '—' }}</td>
                     <td><span class="badge" [class]="logBadge(row.status)">{{ logLabel(row.status) }}</span></td>
-                    <td class="cell-muted" style="max-width: 260px;">
+                    <td class="cell-muted cell-wrap" style="max-width: 260px;">
                       @if (row.last_error) { <div>{{ row.last_error }}</div> }
                       @if (row.status === 'pending' && row.attempts) { <div>Attempt {{ row.attempts + 1 }} at {{ row.send_after | date: 'h:mm a' }}</div> }
                       @if (row.related_entity_type === 'booking') { <a [routerLink]="['/bookings', row.related_entity_id]">Booking #{{ row.related_entity_id }}</a> }
@@ -237,7 +237,7 @@ const LOG_STATUSES: { value: LogStatus; label: string }[] = [
             </table>
           </div>
           @if (logPages > 1) {
-            <div class="row-between" style="padding: 10px 14px; border-top: 1px solid var(--border);">
+            <div class="row-between wrap" style="padding: 10px 14px; border-top: 1px solid var(--border);">
               <span class="cell-muted">Page {{ logPage }} of {{ logPages }} · {{ logTotal }} emails</span>
               <span class="row" style="gap: 6px;">
                 <button class="btn btn-secondary btn-sm" [disabled]="logPage <= 1" (click)="logPage = logPage - 1; loadLog()">‹ Newer</button>
@@ -286,7 +286,7 @@ const LOG_STATUSES: { value: LogStatus; label: string }[] = [
                   </div>
                 </div>
               </div>
-              <div class="modal-footer" style="justify-content: space-between;">
+              <div class="modal-footer" style="justify-content: space-between; flex-wrap: wrap;">
                 <span class="cell-muted">
                   @if (settingsSavedAt && !settingsDirty) { <span style="color: var(--success-700);">✓ Saved at {{ settingsSavedAt | date: 'h:mm:ss a' }}</span> }
                   @else if (settingsDirty) { Unsaved changes }
@@ -607,6 +607,31 @@ const LOG_STATUSES: { value: LogStatus; label: string }[] = [
       .et-theme-pick button { display: flex; gap: 10px; align-items: center; text-align: left; padding: 10px; border: 2px solid var(--border); border-radius: 10px; background: none; cursor: pointer; font-size: 13px; color: inherit; }
       .et-theme-pick button.selected { border-color: var(--brand-600); background: var(--brand-50); }
       .et-swatch { width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; }
+      .et-log-filters { gap: 8px; min-width: 0; }
+      .et-log-select { width: auto; min-width: 0; max-width: 240px; }
+
+      @media (max-width: 640px) {
+        .et-toolbar { align-items: stretch; }
+        .et-search { width: 100%; }
+        .et-log-filters { flex: 1 1 100%; }
+        .et-log-select { flex: 1 1 100%; max-width: none; }
+        .et-desc { max-width: 60vw; }
+        /* The editor takes over the whole screen on a phone. */
+        .et-editor-backdrop { padding: 0; }
+        .et-editor-modal { height: 100vh; height: 100dvh; border-radius: 0; }
+        .et-editor-head { padding: 10px 12px; }
+        .et-name-input { max-width: 100%; }
+        .et-code-half { padding: 12px; }
+        .et-code { font-size: 16px; }
+        .et-preview-head { padding: 8px 12px; flex-wrap: wrap; }
+        .et-preview-scroll { padding: 10px; }
+        .et-editor-foot { padding: 10px 12px; }
+        .et-editor-foot > .row:last-child { flex: 1 1 100%; }
+        .et-editor-foot > .row:last-child .btn { flex: 1 1 auto; }
+      }
+      @media (max-width: 480px) {
+        .et-theme-pick { grid-template-columns: minmax(0, 1fr); }
+      }
     `,
   ],
 })

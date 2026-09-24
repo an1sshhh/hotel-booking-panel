@@ -86,6 +86,7 @@ import { initials } from '../shared/status';
         white-space: pre-wrap;
         word-break: break-word;
       }
+      @media (max-width: 640px) { .diff { max-width: 78vw; } }
     `,
   ],
 })

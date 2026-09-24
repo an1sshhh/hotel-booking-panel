@@ -43,7 +43,7 @@ import { statusBadgeClass } from '../shared/status';
                   <td class="cell-strong">{{ review.hotel_name }}</td>
                   <td>{{ review.customer_name || 'Anonymous' }}</td>
                   <td><span class="star-rating"><app-icon name="star" [size]="13" /> {{ review.rating }}</span></td>
-                  <td style="max-width: 380px;">{{ review.review_text || '—' }}</td>
+                  <td class="cell-wrap" style="max-width: 380px;">{{ review.review_text || '—' }}</td>
                   <td class="cell-muted">{{ review.created_at | date: 'mediumDate' }}</td>
                   <td><span class="badge" [class]="badgeClass(review.status)">{{ review.status }}</span></td>
                   <td class="text-right">

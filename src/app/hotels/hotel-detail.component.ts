@@ -221,7 +221,7 @@ type Tab = 'overview' | 'gallery' | 'amenities' | 'rooms' | 'bookings' | 'review
                 }
               </div>
 
-              <div class="row mt-16" style="gap: 8px; max-width: 420px;">
+              <div class="row mt-16 custom-amenity">
                 <input class="input" type="text" placeholder="Add a custom amenity" [(ngModel)]="customAmenityName"
                        (keyup.enter)="addCustomAmenity()" />
                 <button class="btn btn-secondary" (click)="addCustomAmenity()"><app-icon name="plus" [size]="14" /> Add</button>
@@ -318,7 +318,7 @@ type Tab = 'overview' | 'gallery' | 'amenities' | 'rooms' | 'bookings' | 'review
                     <tr>
                       <td class="cell-strong">{{ review.customer_name }}</td>
                       <td><span class="star-rating"><app-icon name="star" [size]="13" /> {{ review.rating }}</span></td>
-                      <td style="max-width: 420px;">{{ review.review_text }}</td>
+                      <td class="cell-wrap" style="max-width: 420px;">{{ review.review_text }}</td>
                       <td><span class="badge" [class]="badgeClass(review.status)">{{ review.status }}</span></td>
                     </tr>
                   } @empty {
@@ -413,6 +413,7 @@ type Tab = 'overview' | 'gallery' | 'amenities' | 'rooms' | 'bookings' | 'review
         box-shadow: var(--shadow-xs);
       }
       .hero-main { display: flex; gap: 16px; align-items: flex-start; min-width: 0; }
+      .hero-main > .stack { min-width: 0; }
       .hotel-avatar {
         display: grid;
         place-items: center;
@@ -426,8 +427,18 @@ type Tab = 'overview' | 'gallery' | 'amenities' | 'rooms' | 'bookings' | 'review
       }
       .hotel-avatar img { width: 100%; height: 100%; object-fit: cover; }
       .hero-meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-      .hero-meta-item { display: inline-flex; align-items: center; gap: 5px; color: var(--text-muted); font-size: 12.5px; }
-      .amenity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+      .hero-meta-item { display: inline-flex; align-items: center; gap: 5px; min-width: 0; overflow-wrap: anywhere; color: var(--text-muted); font-size: 12.5px; }
+      .amenity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(190px, 100%), 1fr)); gap: 8px; }
+      .custom-amenity { gap: 8px; max-width: 420px; }
+      .custom-amenity .input { min-width: 0; }
+      @media (max-width: 640px) {
+        .hero-card { padding: 14px; gap: 14px; }
+        .hero-main { gap: 12px; }
+        .hotel-avatar { width: 60px; height: 60px; }
+        .hero-meta { gap: 6px 12px; }
+        .hero-card > .page-actions { width: 100%; }
+        .hero-card > .page-actions > .btn { flex: 1 1 auto; }
+      }
       .definition-list dt { display: inline-flex; align-items: center; gap: 6px; }
     `,
   ],
